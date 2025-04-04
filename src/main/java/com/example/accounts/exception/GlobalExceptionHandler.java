@@ -73,6 +73,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles any other Exception and returns an internal server error response.
+     *
+     * @param ex the Exception instance
+     * @param request the HttpServletRequest object
+     * @return ResponseEntity containing an ErrorMessageDto with error details
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorMessageDto> handleException(Exception ex, HttpServletRequest request) {
         ErrorMessageDto errorMessageDto = new ErrorMessageDto(
@@ -81,5 +88,15 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorMessageDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoPrimaryAddressFound.class)
+    public ResponseEntity<ErrorMessageDto> handlePrimaryAddressNotFound(NoPrimaryAddressFound ex, HttpServletRequest request) {
+        ErrorMessageDto errorMessageDto = new ErrorMessageDto(
+                request.getRequestURL().toString(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
     }
 }

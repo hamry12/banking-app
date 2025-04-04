@@ -1,10 +1,8 @@
 package com.example.accounts.controller;
 
-import com.example.accounts.dto.AccountResponseDto;
-import com.example.accounts.dto.AccountsDto;
-import com.example.accounts.dto.AddressRequestDto;
-import com.example.accounts.dto.CustomerRegistrationDto;
+import com.example.accounts.dto.*;
 import com.example.accounts.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,7 @@ public class AccountController {
      */
     @GetMapping("/accounts/{id}")
     public ResponseEntity<?> getAccountDetails(@PathVariable("id") Long accountId) {
-        AccountsDto accountDetails= accountService.getAccountDetails(accountId);
+        AccountResponseDto accountDetails= accountService.getAccountDetails(accountId);
         return ResponseEntity.ok(accountDetails);
     }
 
@@ -34,16 +32,16 @@ public class AccountController {
      * @return ResponseEntity containing the newly created account's ID and creation date
      */
     @PostMapping("/accounts")
-    public ResponseEntity<?> createAccount(@RequestBody CustomerRegistrationDto customerRegistrationDto) {
-        AccountResponseDto accountDetails= accountService.createAccount(customerRegistrationDto);
+    public ResponseEntity<?> createAccount(@Valid @RequestBody CustomerRegistrationDto customerRegistrationDto) {
+        SuccessMessageDto accountDetails= accountService.createAccount(customerRegistrationDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(accountDetails);
     }
 
     @PutMapping("/accounts")
-    public ResponseEntity<AccountResponseDto> updateAccountDetails(@RequestParam("accountId") Long accountId,
-            @RequestBody CustomerRegistrationDto customerRegistrationDto) {
-        AccountResponseDto accountDetails= accountService
+    public ResponseEntity<SuccessMessageDto> updateAccountDetails(@RequestParam("accountId") Long accountId,
+                                                                  @RequestBody CustomerRegistrationDto customerRegistrationDto) {
+        SuccessMessageDto accountDetails= accountService
                 .updateCustomerDetails(accountId, customerRegistrationDto);
         return ResponseEntity.ok(accountDetails);
     }
@@ -51,7 +49,7 @@ public class AccountController {
     @PostMapping("/accounts/{accountId}")
     public ResponseEntity<?> addAddress(@PathVariable("accountId") Long accountId,
                                         @RequestBody AddressRequestDto newAddressRequestDto) {
-        AccountResponseDto accountResponseDto=
+        SuccessMessageDto accountResponseDto=
                 accountService.addNewAddress(accountId, newAddressRequestDto);
         return ResponseEntity.ok(accountResponseDto);
 

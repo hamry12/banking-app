@@ -3,6 +3,7 @@ package com.example.accounts.utils;
 import com.example.accounts.dto.AddressRequestDto;
 import com.example.accounts.dto.CustomerRegistrationDto;
 import com.example.accounts.entity.Address;
+import com.example.accounts.exception.NoPrimaryAddressFound;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class IdGenerationUtils {
      */
 
     public String generateCustomerId(CustomerRegistrationDto customerRegistrationDto) {
-        String timestamp=String.valueOf(generateTimestamp());
+        String timestamp=String.valueOf(generateTimestamp()).substring(0,12);
         List<AddressRequestDto> addressList= customerRegistrationDto.getAddresses();
+
         AddressRequestDto address = addressList
                 .stream()
                 .filter(list -> list.getAddressType() == 1)
@@ -49,9 +51,8 @@ public class IdGenerationUtils {
      *
      * @return the timestamp.
      */
-    public static int generateTimestamp() {
-        long timestamp=System.currentTimeMillis();
-        return (int)timestamp;
+    public static long generateTimestamp() {
+        return System.currentTimeMillis();
     }
 
     /**

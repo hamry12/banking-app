@@ -19,7 +19,11 @@ public class Accounts extends BaseEntity{
     @Id
     @Column(name = "account_id")
     private Long accountId;
-    private String customerId;
+
+    @OneToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false)
+    private Customers customers;
+
     private String ifscCode;
     private String branchAddress;
 

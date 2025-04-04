@@ -4,6 +4,7 @@ import com.example.accounts.dto.*;
 import com.example.accounts.entity.*;
 import com.example.accounts.exception.AccountExistException;
 import com.example.accounts.exception.AccountNotVerifiedException;
+import com.example.accounts.exception.NoPrimaryAddressFound;
 import com.example.accounts.exception.NoSuchAccountExist;
 import com.example.accounts.repository.AccountRepository;
 import com.example.accounts.repository.AddressRepository;
@@ -39,8 +40,8 @@ public class AccountServiceImpl implements AccountService {
      * @return AccountsDto containing the account details
      */
     @Override
-    public AccountsDto getAccountDetails(Long accountId) {
-        AccountsDto accountDetails = new AccountsDto();
+    public AccountResponseDto getAccountDetails(Long accountId) {
+        AccountResponseDto accountDetails = new AccountResponseDto();
         Optional<Accounts> account = accountRepository.findById(accountId);
         if(account.isEmpty()) {
             throw new NoSuchAccountExist("Account does not exist with account id: " + accountId);
@@ -49,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
         if(accountStatus.equalsIgnoreCase("PENDING")){
             throw new AccountNotVerifiedException("Account is not verified");
         }
-        String customerId = account.get().getCustomerId();
+        String customerId = account.get().getCustomers().getCustomerId();
         Optional<Customers> customer = customerRepository.findById(customerId);
         if(customer.isPresent()) {
             accountDetails.setAccountHolderName(
@@ -72,12 +73,25 @@ public class AccountServiceImpl implements AccountService {
      * @return AccountCreatedDto containing the newly created account's ID and creation date
      */
     @Override
-    public AccountResponseDto createAccount(CustomerRegistrationDto customerRegistrationDto) {
+    public SuccessMessageDto createAccount(CustomerRegistrationDto customerRegistrationDto) {
         String email = customerRegistrationDto.getEmail();
+        String mobile= customerRegistrationDto.getMobile();
+
+        if(customerRegistrationDto.getAddresses()
+                .stream()
+                .noneMatch(list->list.getAddressType() == 1)){
+            throw new NoPrimaryAddressFound("No primary address found");
+        }
+
         Optional<Customers> customer = customerRepository.findByEmail(email);
         if(customer.isPresent()){
             throw new AccountExistException("Customer already exists with email: " + email);
         }
+        Optional<Customers> customerDataBasedOnMobile = customerRepository.findByMobile(mobile);
+        if(customerDataBasedOnMobile.isPresent()){
+            throw new AccountExistException("Customer already exists with mobile: " + mobile);
+        }
+
         String customerId= idGenerationUtils.generateCustomerId(customerRegistrationDto);
         Customers customers= mapperUtils.mapToCustomer(customerRegistrationDto, new Customers());
         customers.setCreatedBy(customerRegistrationDto.getCreatedBy());
@@ -96,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
         accounts.setAccountId(accountId);
         accountRepository.save(accounts);
 
-        AccountResponseDto accountCreatedDto = new AccountResponseDto();
+        SuccessMessageDto accountCreatedDto = new SuccessMessageDto();
         accountCreatedDto.setAccountId(accountId);
         accountCreatedDto.setCreatedAt(LocalDateTime.now());
         accountCreatedDto.setMessage("Account created successfully");
@@ -104,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponseDto updateCustomerDetails(
+    public SuccessMessageDto updateCustomerDetails(
             Long accountId,
             CustomerRegistrationDto customerRegistrationDto) {
 
@@ -113,13 +127,15 @@ public class AccountServiceImpl implements AccountService {
             throw new NoSuchAccountExist("Account does not exist with account id: " + accountId);
         }
 
-        Customers customers=customerRepository.findById(accountDetails.get().getCustomerId()).get();
+        Customers customers=customerRepository
+                .findById(accountDetails.get().getCustomers().getCustomerId()).get();
+
         Customers updatedCustomer= mapperUtils.mapToCustomer(customerRegistrationDto, customers);
         updatedCustomer.setUpdatedBy(customerRegistrationDto.getCreatedBy());
         updatedCustomer.setCustomerId(customers.getCustomerId());
         customerRepository.save(updatedCustomer);
 
-        AccountResponseDto accountCreatedDto = new AccountResponseDto();
+        SuccessMessageDto accountCreatedDto = new SuccessMessageDto();
         accountCreatedDto.setAccountId(accountId);
         accountCreatedDto.setCreatedAt(LocalDateTime.now());
         accountCreatedDto.setMessage("Customer details updated successfully");
@@ -127,12 +143,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponseDto addNewAddress(Long accountId, AddressRequestDto newAddressRequestDto) {
+    public SuccessMessageDto addNewAddress(Long accountId, AddressRequestDto newAddressRequestDto) {
         Optional<Accounts> accounts= accountRepository.findById(accountId);
         if(accounts.isEmpty()){
             throw new NoSuchAccountExist("Account does not exist with account id: " + accountId);
         }
-        String customerId= accounts.get().getCustomerId();
+        String customerId= accounts.get().getCustomers().getCustomerId();
         Customers customers= customerRepository.findById(customerId).orElseThrow(()-> new RuntimeException(" Customer Data not found!!"));
         int addressTypeOrdinal= newAddressRequestDto.getAddressType();
         if(addressTypeOrdinal == 1){
@@ -142,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
         address.setCustomers(customers);
         addressRepository.save(address);
 
-        AccountResponseDto accountCreatedDto = new AccountResponseDto();
+        SuccessMessageDto accountCreatedDto = new SuccessMessageDto();
         accountCreatedDto.setAccountId(accountId);
         accountCreatedDto.setCreatedAt(LocalDateTime.now());
         accountCreatedDto.setMessage("Address added successfully");

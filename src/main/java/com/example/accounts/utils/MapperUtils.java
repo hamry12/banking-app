@@ -52,12 +52,12 @@ public class MapperUtils {
         String ifscCode= customerRegistrationDto.getIfscCode();
         String createdBy=customerRegistrationDto.getCreatedBy();
         AccountType accountType=
-                customerRegistrationDto.getAccountType().equals("1")
+                customerRegistrationDto.getAccountType() == 1
                         ?AccountType.SAVINGS
                         :AccountType.CURRENT;
         accounts.setAccountType(accountType);
         accounts.setBranchAddress(branchAddress);
-        accounts.setCustomerId(savedCustomer.getCustomerId());
+        accounts.setCustomers(savedCustomer);
         accounts.setIfscCode(ifscCode);
         accounts.setCreatedBy(createdBy);
         accounts.setAccountStatus(AccountStatus.PENDING);

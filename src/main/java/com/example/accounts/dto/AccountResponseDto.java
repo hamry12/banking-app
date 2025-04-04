@@ -1,12 +1,20 @@
 package com.example.accounts.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
-
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountResponseDto {
     private Long accountId;
-    private String message;
-    private LocalDateTime createdAt;
+    private String accountType;
+    private String branchAddress;
+    private String accountHolderName;
+    private String email;
+    private String mobile;
+    private String ifscCode;
 }
