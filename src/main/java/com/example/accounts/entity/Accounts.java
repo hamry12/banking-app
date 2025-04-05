@@ -1,12 +1,11 @@
 package com.example.accounts.entity;
 
+import com.example.accounts.dto.AccountType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigInteger;
 
 @Getter
 @Setter

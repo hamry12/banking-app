@@ -1,7 +1,6 @@
 package com.example.accounts.utils;
 
-import com.example.accounts.dto.AddressRequestDto;
-import com.example.accounts.dto.CustomerRegistrationDto;
+import com.example.accounts.dto.*;
 import com.example.accounts.entity.*;
 import org.springframework.stereotype.Component;
 
@@ -75,5 +74,19 @@ public class MapperUtils {
         address.setZip(addressDto.getZip());
         address.setCountry(addressDto.getCountry());
         return address;
+    }
+
+    /**
+     * Maps an AddPayeeDetailsDto object to an AddPayee object.
+     * @param addPayeeDetailsDto the source object
+     * @param addPayee the target object
+     * @return the updated AddPayee object
+     */
+    public AddPayee mapToAddPayee(AddPayeeDetailsDto addPayeeDetailsDto, AddPayee addPayee) {
+        addPayee.setAccountHolderName(addPayeeDetailsDto.getAccountHolderName());
+        addPayee.setReceiverAccountId(addPayeeDetailsDto.getAccountTobeAdded());
+        addPayee.setIfscCode(addPayeeDetailsDto.getIfscCode());
+        addPayee.setBankSameAsSender(addPayeeDetailsDto.isBankSameAsSender());
+        return addPayee;
     }
 }

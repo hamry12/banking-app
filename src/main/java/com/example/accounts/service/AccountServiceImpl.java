@@ -2,11 +2,9 @@ package com.example.accounts.service;
 
 import com.example.accounts.dto.*;
 import com.example.accounts.entity.*;
-import com.example.accounts.exception.AccountExistException;
-import com.example.accounts.exception.AccountNotVerifiedException;
-import com.example.accounts.exception.NoPrimaryAddressFound;
-import com.example.accounts.exception.NoSuchAccountExist;
+import com.example.accounts.exception.*;
 import com.example.accounts.repository.AccountRepository;
+import com.example.accounts.repository.AddPayeeRepository;
 import com.example.accounts.repository.AddressRepository;
 import com.example.accounts.repository.CustomerRepository;
 import com.example.accounts.utils.IdGenerationUtils;
@@ -29,6 +27,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
     private CustomerRepository customerRepository;
     private AddressRepository addressRepository;
+    private AddPayeeRepository addPayeeRepository;
     private MapperUtils mapperUtils;
     private IdGenerationUtils idGenerationUtils;
 
@@ -163,5 +162,35 @@ public class AccountServiceImpl implements AccountService {
         accountCreatedDto.setCreatedAt(LocalDateTime.now());
         accountCreatedDto.setMessage("Address added successfully");
         return accountCreatedDto;
+    }
+
+    /**
+     * Add a new payee to the account.
+     * @param addPayeeDetailsDto containing the payee details
+     * @return ResponseEntity containing the success message
+     */
+    @Override
+    public SuccessMessageDto addPayee(Long accountId, AddPayeeDetailsDto addPayeeDetailsDto) {
+        Optional<Accounts> accounts= accountRepository.findById(accountId);
+        Long accountToBeAdded= addPayeeDetailsDto.getAccountTobeAdded();
+        if(accounts.isEmpty()){
+            throw new NoSuchAccountExist("Account does not exist with account id: " + accountId);
+        }
+        /*
+          Additional checks such as if account which needs to be added belongs to same bank
+          can be verified and information can be fetched from there.
+         */
+        if(addPayeeRepository
+                .existsByAccounts_accountIdAndReceiverAccountId(accountId, accountToBeAdded)){
+            throw new PayeeExistException("Payee already exists "+ accountToBeAdded);
+        }
+        AddPayee addPayee= mapperUtils.mapToAddPayee(addPayeeDetailsDto, new AddPayee());
+        addPayee.setAccounts(accounts.get());
+        addPayeeRepository.save(addPayee);
+        SuccessMessageDto payeeAdded = new SuccessMessageDto();
+        payeeAdded.setAccountId(addPayee.getAccounts().getAccountId());
+        payeeAdded.setCreatedAt(LocalDateTime.now());
+        payeeAdded.setMessage("Payee added successfully");
+        return payeeAdded;
     }
 }

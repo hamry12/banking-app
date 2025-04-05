@@ -106,6 +106,7 @@ paths:
         '200':
           description: Successfully retrieved accounts
 ```
+In order to see the entire list of APIs, you can visit the [Swagger UI](http://localhost:8080/swagger-ui/index.html).
 
 ## 4. Database Entities
 ### Entity Relationship Diagram

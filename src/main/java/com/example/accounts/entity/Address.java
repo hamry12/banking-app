@@ -1,10 +1,8 @@
 package com.example.accounts.entity;
 
+import com.example.accounts.dto.AddressType;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

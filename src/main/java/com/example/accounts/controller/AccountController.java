@@ -46,13 +46,27 @@ public class AccountController {
         return ResponseEntity.ok(accountDetails);
     }
 
-    @PostMapping("/accounts/{accountId}")
+    /**
+     * Endpoint to add a new address to an existing account.
+     * @param accountId unique identifier of the account
+     * @param newAddressRequestDto containing the new address details
+     * @return ResponseEntity containing the success message
+     */
+    @PostMapping("/address/{accountId}")
     public ResponseEntity<?> addAddress(@PathVariable("accountId") Long accountId,
                                         @RequestBody AddressRequestDto newAddressRequestDto) {
         SuccessMessageDto accountResponseDto=
                 accountService.addNewAddress(accountId, newAddressRequestDto);
         return ResponseEntity.ok(accountResponseDto);
+    }
 
+    @PostMapping("/accounts/{accountId}/addpayee")
+    public ResponseEntity<?> addPayee(
+            @PathVariable("accountId") Long accountId,
+            @Valid @RequestBody AddPayeeDetailsDto addPayeeDetailsDto) {
+        SuccessMessageDto accountResponseDto=
+                accountService.addPayee(accountId, addPayeeDetailsDto);
+        return ResponseEntity.ok(accountResponseDto);
     }
 
 }

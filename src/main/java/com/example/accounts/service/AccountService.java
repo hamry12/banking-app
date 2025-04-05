@@ -11,4 +11,6 @@ public interface AccountService {
     SuccessMessageDto updateCustomerDetails(Long accountId, CustomerRegistrationDto customerRegistrationDto);
 
     SuccessMessageDto addNewAddress(Long accountId, AddressRequestDto newAddressRequestDto);
+
+    SuccessMessageDto addPayee(Long accountId,AddPayeeDetailsDto addPayeeDetailsDto);
 }

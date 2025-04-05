@@ -4,10 +4,14 @@ import com.example.accounts.dto.ErrorMessageDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -90,13 +94,60 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessageDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles NoPrimaryAddressFound exceptions and returns a bad request response.
+     *
+     * @param ex the NoPrimaryAddressFound instance
+     * @param request the HttpServletRequest object
+     * @return ResponseEntity containing an ErrorMessageDto with error details
+     */
     @ExceptionHandler(NoPrimaryAddressFound.class)
-    public ResponseEntity<ErrorMessageDto> handlePrimaryAddressNotFound(NoPrimaryAddressFound ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorMessageDto> handlePrimaryAddressNotFound(
+            NoPrimaryAddressFound ex,
+            HttpServletRequest request) {
         ErrorMessageDto errorMessageDto = new ErrorMessageDto(
                 request.getRequestURL().toString(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles PayeeExistException and returns a bad request response.
+     *
+     * @param ex      the PayeeExistException instance
+     * @param request the HttpServletRequest object
+     * @return ResponseEntity containing an ErrorMessageDto with error details
+     */
+    @ExceptionHandler(PayeeExistException.class)
+    public ResponseEntity<ErrorMessageDto> handlePayeeExistException(
+            PayeeExistException ex,
+            HttpServletRequest request) {
+
+        ErrorMessageDto errorMessageDto = new ErrorMessageDto(
+                request.getRequestURL().toString(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles MethodArgumentNotValidException and returns a bad request response.
+     * Extracts the error messages from the binding result and returns them in a map.
+     *
+     * @param ex the MethodArgumentNotValidException instance
+     * @return ResponseEntity containing a map of error messages
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }
