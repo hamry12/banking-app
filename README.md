@@ -117,35 +117,58 @@ Below is the ER diagram representing the relationships between **customers**, **
 ### Customers Table
 Stores customer details.
 ```sql
-CREATE TABLE customers (
-    customer_id VARCHAR(255) PRIMARY KEY,
-    created_at DATETIME(6),
-    created_by VARCHAR(255),
-    updated_at DATETIME(6),
-    updated_by VARCHAR(255),
-    email VARCHAR(255),
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    mobile VARCHAR(255)
-);
+CREATE TABLE `customers` (
+  `customer_id` varchar(255) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `mobile` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+```
+
+### Add payee table
+Stores payee details linked to account
+```
+CREATE TABLE `add_payee` (
+  `payee_id` bigint NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(6) DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  `account_holder_name` varchar(255) DEFAULT NULL,
+  `ifsc_code` varchar(255) DEFAULT NULL,
+  `is_bank_same_as_sender` bit(1) NOT NULL,
+  `receiver_account_id` bigint DEFAULT NULL,
+  `account_id` bigint NOT NULL,
+  PRIMARY KEY (`payee_id`),
+  UNIQUE KEY `UKpw2pf63c0ba5xjdrijkbschmy` (`account_id`),
+  CONSTRAINT `FK8a7de012gb612mk3n0iqepfuk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
 
 ### Accounts Table
 Stores account details linked to customers.
 ```sql
-CREATE TABLE accounts (
-    account_id BIGINT PRIMARY KEY,
-    created_at DATETIME(6),
-    created_by VARCHAR(255),
-    updated_at DATETIME(6),
-    updated_by VARCHAR(255),
-    account_status ENUM(...),
-    account_type ENUM(...),
-    branch_address VARCHAR(255),
-    ifsc_code VARCHAR(255),
-    customer_id VARCHAR(255),
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
+CREATE TABLE `accounts` (
+  `account_id` bigint NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  `account_status` enum('ACTIVE','INACTIVE','PENDING') DEFAULT NULL,
+  `account_type` enum('CURRENT','SAVINGS') DEFAULT NULL,
+  `branch_address` varchar(255) DEFAULT NULL,
+  `ifsc_code` varchar(255) DEFAULT NULL,
+  `customer_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`account_id`),
+  UNIQUE KEY `UKd7wccbpluupn8cbm0o7nc1mhj` (`customer_id`),
+  CONSTRAINT `FKn6x8pdp50os8bq5rbb792upse` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
 
 ### Address Table
