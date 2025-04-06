@@ -51,6 +51,10 @@ public class TransactionServiceImpl implements TransactionService{
             throw new SameAccountException("Amount can not be transferred to the same account");
         }
 
+        /**
+         * Todo: Add the logic to check the balance before transfer
+         */
+
         boolean isSameBank=transferRequestDto.getReceiverAccountDetails().isBankSameAsSender();
         TransactionType transferMethod = transferRequestDto.getTransferMethod();
         TransactionStatus transactionStatus;
@@ -58,6 +62,10 @@ public class TransactionServiceImpl implements TransactionService{
         TransferResponseDto transferResponseDto= new TransferResponseDto();
         String transactionId=idGeneratorUtils.generateId();
         Transactions transactions= transactionMapper.mapToTransactions(transferRequestDto);
+
+        /**
+         * Todo: Add the design pattern to handle the different transfer methods and update the transaction status
+         */
         if(transferMethod.equals(TransactionType.IMPS)){
             transactionStatus= TransactionStatus.SUCCESS;
             message="Amount transferred successfully";
@@ -66,10 +74,9 @@ public class TransactionServiceImpl implements TransactionService{
             message="Amount transfer requested successfully";
         }
         transactions.setTransactionStatus(transactionStatus);
-
         transactions.setTransactionId(transactionId);
-        transactions.setTotalAmount(
-                transactions.getTransactionAmount().add(transactions.getTransactionFee()));
+        transactions.setTotalAmount(transactions.getTransactionAmount()
+                .add(transactions.getTransactionFee()));
         Transactions savedTransaction = transactionRepository.save(transactions);
         if(!isSameBank){
             ExternalAccounts externalAccounts=
