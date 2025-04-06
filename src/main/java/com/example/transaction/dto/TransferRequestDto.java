@@ -1,6 +1,6 @@
 package com.example.transaction.dto;
 
-import com.example.transaction.constants.TransfferMethod;
+import com.example.transaction.constants.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransferRequestDto {
-    private String fromAccountId;
+    private Long fromAccountId;
     private ReceiverAccountDetailsDto receiverAccountDetails;
     private BigDecimal amountToBeTransferred;
     private BigDecimal additionalCharges;
-    private TransfferMethod transferMethod;
+    private TransactionType transferMethod;
 }

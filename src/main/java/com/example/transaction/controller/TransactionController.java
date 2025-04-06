@@ -32,7 +32,7 @@ public class TransactionController {
      * @param transferRequestDto the details of the transfer request
      * @return a response with the transaction id and a success message
      */
-    @PostMapping("/balance/transfer/")
+    @PostMapping("/balance/transfer")
     public ResponseEntity<?> transferBalance(
             @RequestBody TransferRequestDto transferRequestDto) {
         TransferResponseDto transferResponseDto =
