@@ -53,4 +53,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TransactionTypeNotSupportedException.class)
+    public ResponseEntity<ErrorMessageDto> handleTransactionTypeNotSupportedException(
+            TransactionTypeNotSupportedException ex,
+            HttpServletRequest request) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto(
+                    request.getRequestURL().toString(),
+                    ex.getMessage(),
+                    LocalDateTime.now()
+            );
+            return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
+    }
+
 }

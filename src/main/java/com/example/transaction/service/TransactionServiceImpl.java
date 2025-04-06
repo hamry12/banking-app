@@ -8,6 +8,8 @@ import com.example.transaction.entity.Transactions;
 import com.example.transaction.exception.SameAccountException;
 import com.example.transaction.repository.ExternalRepository;
 import com.example.transaction.repository.TransactionRepository;
+import com.example.transaction.strategy.TransactionStrategy;
+import com.example.transaction.strategy.TransactionStrategyFactory;
 import com.example.transaction.utils.IDGeneratorUtils;
 import com.example.transaction.utils.TransactionMapper;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ public class TransactionServiceImpl implements TransactionService{
     private TransactionMapper transactionMapper;
     private IDGeneratorUtils idGeneratorUtils;
     private ExternalRepository externalRepository;
+    private TransactionStrategyFactory transactionStrategyFactory;
 
     /**
      * Service to get the account balance.
@@ -65,14 +68,20 @@ public class TransactionServiceImpl implements TransactionService{
 
         /**
          * Todo: Add the design pattern to handle the different transfer methods and update the transaction status
+         * uncomment this section only if you do not want design pattern based implementation
+         * if(transferMethod.equals(TransactionType.IMPS)){
+         *             transactionStatus= TransactionStatus.SUCCESS;
+         *             message="Amount transferred successfully";
+         *         }else{
+         *             transactionStatus=TransactionStatus.PENDING;
+         *             message="Amount transfer requested successfully";
+         *         }
          */
-        if(transferMethod.equals(TransactionType.IMPS)){
-            transactionStatus= TransactionStatus.SUCCESS;
-            message="Amount transferred successfully";
-        }else{
-            transactionStatus=TransactionStatus.PENDING;
-            message="Amount transfer requested successfully";
-        }
+        TransactionStrategy transactionStrategy=
+                transactionStrategyFactory.getStrategy(transferMethod);
+        transactionStatus=transactionStrategy.getTransactionStatus();
+        message=transactionStrategy.getMessage();
+
         transactions.setTransactionStatus(transactionStatus);
         transactions.setTransactionId(transactionId);
         transactions.setTotalAmount(transactions.getTransactionAmount()
