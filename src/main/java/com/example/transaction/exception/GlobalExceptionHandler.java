@@ -65,4 +65,16 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ErrorMessageDto> handleInsufficientBalanceException(
+            InsufficientBalanceException ex,
+            HttpServletRequest request) {
+        ErrorMessageDto errorMessageDto = new ErrorMessageDto(
+                request.getRequestURL().toString(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorMessageDto, HttpStatus.BAD_REQUEST);
+    }
+
 }

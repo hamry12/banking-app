@@ -5,7 +5,9 @@ import com.example.transaction.constants.TransactionType;
 import com.example.transaction.dto.*;
 import com.example.transaction.entity.ExternalAccounts;
 import com.example.transaction.entity.Transactions;
+import com.example.transaction.exception.InsufficientBalanceException;
 import com.example.transaction.exception.SameAccountException;
+import com.example.transaction.repository.AccountBalanceRepository;
 import com.example.transaction.repository.ExternalRepository;
 import com.example.transaction.repository.TransactionRepository;
 import com.example.transaction.strategy.TransactionStrategy;
@@ -15,6 +17,7 @@ import com.example.transaction.utils.TransactionMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -27,6 +30,7 @@ public class TransactionServiceImpl implements TransactionService{
     private IDGeneratorUtils idGeneratorUtils;
     private ExternalRepository externalRepository;
     private TransactionStrategyFactory transactionStrategyFactory;
+    private AccountBalanceRepository accountBalanceRepository;
 
     /**
      * Service to get the account balance.
@@ -35,8 +39,13 @@ public class TransactionServiceImpl implements TransactionService{
      * @return the balance details.
      */
     @Override
-    public BalanceResponseDto getBalance(String accountId) {
+    public BalanceResponseDto getBalance(Long accountId) {
         BalanceResponseDto balanceResponseDto= new BalanceResponseDto();
+        BigDecimal balanceByAccountId = accountBalanceRepository.findBalanceByAccountId(accountId);
+        if(balanceByAccountId==null){
+            balanceByAccountId=new BigDecimal(0);
+        }
+        balanceResponseDto.setAvailableBalance(balanceByAccountId);
         return balanceResponseDto;
     }
 
@@ -57,6 +66,11 @@ public class TransactionServiceImpl implements TransactionService{
         /**
          * Todo: Add the logic to check the balance before transfer
          */
+        BalanceResponseDto balanceResponseDto=getBalance(fromAccountId);
+        if(balanceResponseDto.getAvailableBalance()
+                .compareTo(transferRequestDto.getAmountToBeTransferred())<0) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
 
         boolean isSameBank=transferRequestDto.getReceiverAccountDetails().isBankSameAsSender();
         TransactionType transferMethod = transferRequestDto.getTransferMethod();
@@ -93,6 +107,10 @@ public class TransactionServiceImpl implements TransactionService{
             externalAccounts.setTransactions(savedTransaction);
             externalRepository.save(externalAccounts);
         }
+
+        /**
+         * Todo: Add the logic to update the balance
+         */
         transferResponseDto.setTransactionId(transactionId);
         transferResponseDto.setMessage(message);
         transferResponseDto.setTimestamp(LocalDateTime.now());

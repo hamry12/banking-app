@@ -22,7 +22,7 @@ public class TransactionController {
      * @return a response with the balance details
      */
     @GetMapping("/balance/{accountId}")
-    public ResponseEntity<BalanceResponseDto> getBalance(@PathVariable("accountId") String accountId) {
+    public ResponseEntity<BalanceResponseDto> getBalance(@PathVariable("accountId") Long accountId) {
         BalanceResponseDto balanceDetails = transactionService.getBalance(accountId);
         return new ResponseEntity<>(balanceDetails, HttpStatus.OK);
     }

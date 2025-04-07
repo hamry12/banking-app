@@ -96,7 +96,16 @@ CREATE TABLE `transaction_type` (
   `effective_till` timestamp DEFAULT NULL,
   PRIMARY KEY (`transaction_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
+4. **account_balance:** Stores account balance details
 
+```SQL
+CREATE TABLE `account_balance` (
+  `account_id` bigint NOT NULL,
+  `balance` decimal(38,2) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
 
 ---
