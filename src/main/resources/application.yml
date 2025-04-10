@@ -2,14 +2,22 @@ spring:
   application:
     name: "configserver"
   profiles:
-    active: native
+    active: git
+#    active: native  #-> to be used only in case of classpath and file based properties
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:config
+        git:
+          uri: "https://github.com/hamry12/banking-app.git"
+          default-label: "config-management"
+          timeout: 5
+          clone-on-start: true
+          force-pull: true
+#        native:
+#          search-locations: classpath:config #-> for classpath
+#          search-locations: file:/Users/himanshu/Documents/springboot-projects/Bank%20Service/config  #-> for file
 server:
   port: 8071
-logging:
-  level:
-    root: DEBUG
+#logging:
+#  level:
+#    root: DEBUG

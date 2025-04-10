@@ -24,6 +24,7 @@ This config server is set up to serve configuration properties for two microserv
 we can configure the server to manage the data either from github, file system or database.
 
 ## Setup at client side
+### application.yml
 ```yml
 spring:
   application:
@@ -33,6 +34,7 @@ spring:
       uri: http://localhost:8071
 ```
 
+### pom.xml
 ```pom.xml
 <properties>
     <java.version>17</java.version>
