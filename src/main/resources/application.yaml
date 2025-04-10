@@ -1,33 +1,7 @@
-server:
-  port: 8080
 spring:
   application:
-    name: accounts
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:bank}
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:root@123}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: bank
-jwt:
-  secret:
-    key: mySecretKey123456
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-      type:
-        descriptor:
-          sql:
-            BasicBinder: TRACE
+    name: "accounts"
+  config:
+    import: "configserver:http://localhost:8071"
+server:
+  port: 8080
