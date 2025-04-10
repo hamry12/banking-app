@@ -1,16 +1,7 @@
 spring:
   application:
-    name: transaction
-  datasource:
-    url: jdbc:mysql://localhost:3306/transactions
-    username: root
-    password: root@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+    name: "transaction"
+  config:
+      import: "configserver:http://localhost:8071"
 server:
   port: 8081
