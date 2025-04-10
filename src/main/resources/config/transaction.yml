@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: "transaction"
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:transactions}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root@123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: bank
