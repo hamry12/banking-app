@@ -59,7 +59,7 @@ public class MapperUtils {
         accounts.setCustomers(savedCustomer);
         accounts.setIfscCode(ifscCode);
         accounts.setCreatedBy(createdBy);
-        accounts.setAccountStatus(AccountStatus.PENDING);
+        accounts.setAccountStatus(AccountStatus.ACTIVE);
         return accounts;
     }
 
