@@ -1,6 +1,7 @@
 package com.example.transaction.service;
 
 import com.example.transaction.client.AccountFeignClients;
+import com.example.transaction.constants.TransactionDirection;
 import com.example.transaction.constants.TransactionStatus;
 import com.example.transaction.constants.TransactionType;
 import com.example.transaction.dto.*;
@@ -91,7 +92,7 @@ public class TransactionServiceImpl implements TransactionService{
         String transactionId=idGeneratorUtils.generateId();
 
 //        Map the transaction details
-        Transactions transactions= transactionMapper.mapToTransactions(transferRequestDto);
+        Transactions senderTransaction= transactionMapper.mapToTransactions(transferRequestDto);
 
 //        Fetch transaction status and message
         TransactionStrategy transactionStrategy=
@@ -100,12 +101,11 @@ public class TransactionServiceImpl implements TransactionService{
         message=transactionStrategy.getMessage();
 
 //        save transaction information in the database
-        transactions.setTransactionStatus(transactionStatus);
-        transactions.setTransactionId(transactionId);
-        transactions.setTotalAmount(transactions.getTransactionAmount()
-                .add(transactions.getTransactionFee()));
-        Transactions savedTransaction = transactionRepository.save(transactions);
-
+        senderTransaction.setTransactionStatus(transactionStatus);
+        senderTransaction.setTransactionId(transactionId);
+        senderTransaction.setTotalAmount(amountToBeTransferred.add(additionalCharges));
+        senderTransaction.setTransactionDirection(TransactionDirection.DEBIT);
+        Transactions savedTransaction = transactionRepository.save(senderTransaction);
 
 //        update balance of the sender account
         BigDecimal remainingBalance=balanceResponseDto
@@ -123,6 +123,20 @@ public class TransactionServiceImpl implements TransactionService{
             BigDecimal receiverBalance=accountBalanceRepository.findBalanceByAccountId(toAccountId);
             receiverBalance=receiverBalance.add(amountToBeTransferred);
             accountBalanceRepository.updateBalanceByAccountId(toAccountId,receiverBalance);
+
+            Transactions receiverTransaction= new Transactions();
+            receiverTransaction.setFromAccountId(fromAccountId);
+            receiverTransaction.setToAccountId(toAccountId);
+            receiverTransaction.setTransactionDate(LocalDateTime.now());
+            receiverTransaction.setTransactionType(transferMethod);
+            receiverTransaction.setTransactionStatus(transactionStatus);
+            receiverTransaction.setTransactionFee(additionalCharges);
+            receiverTransaction.setTransactionAmount(amountToBeTransferred);
+            receiverTransaction.setTotalAmount(amountToBeTransferred.add(additionalCharges));
+            receiverTransaction.setTransactionId(transactionId);
+            receiverTransaction.setTransactionDirection(TransactionDirection.CREDIT);
+            receiverTransaction.setSameBank(isSameBank);
+            transactionRepository.save(receiverTransaction);
         }
 
         transferResponseDto.setTransactionId(transactionId);
