@@ -6,17 +6,15 @@ This microservice is responsible for handling **balance inquiries**, **fund tran
 
 ## 📑 Table of Contents
 
-- [Features](#features)
-- [Design Principles & Patterns](#design-principles--patterns)
-- [API Documentation](#api-documentation)
-- [Endpoints](#endpoints)
-- [Transfer Strategy Example](#transfer-strategy-example)
-- [Entity Design](#entity-design)
-- [Constants Used](#constants-used)
-- [Statement & Notification](#statement--notification)
-- [Future Enhancements](#future-enhancements)
-- [Getting Started](#getting-started)
-- [License](#license)
+- [Features](#-features)
+- [Design Principles & Patterns](#-design-principles--patterns)
+- [API Documentation](#-api-documentation)
+- [Endpoints](#-endpoints)
+- [Transfer Strategy Example](#-transfer-strategy-example)
+- [Entity Design](#-entity-design)
+- [Constants Used](#-constants-used)
+- [Api Communication](#-api-communication)
+- [Future Enhancements](#-future-enhancements)
 
 ---
 
@@ -49,7 +47,7 @@ Or open in browser: `http://localhost:8081/swagger-ui/index.html#`
 
 ---
 
-### 🧱 Entity Design (SQL Schema)
+### 🧱 Entity Design
 
 1. **external_accounts:** Stores details of beneficiaries from other banks.
    
@@ -107,9 +105,7 @@ CREATE TABLE `account_balance` (
   PRIMARY KEY (`account_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
-
 ---
-
 ## 📌 Endpoints
 
 ### 1. `GET /balance/{accountId}`
@@ -126,18 +122,33 @@ CREATE TABLE `account_balance` (
 ### 🧾 Additional Functional Features
 ✅ Notification System
 Implemented using the Observer Design Pattern
-
 Sends alerts upon successful/failed transactions (SMS, Email)
 
 📃 Statement Requests
 API for generating account statements based on:
-
 Days (last 7/30 days)
-
 Specific months
-
 Custom date range (future scope)
 
+---
+
+### 🔗 API Communication
+To enable seamless and declarative inter-service communication, this project uses OpenFeign, a REST client developed by Netflix and now part of the Spring Cloud ecosystem. It allows microservices to communicate with each other in a clean, interface-driven way without manually handling HTTP requests.
+
+### 🛠 Why OpenFeign?
+- Declarative Syntax: Define HTTP clients using Java interfaces and annotations.
+- Spring Cloud Integration: Works out of the box with Spring Boot and Spring Cloud for service discovery (Eureka, Consul).
+- Simplified Codebase: Eliminates boilerplate RestTemplate or WebClient code.
+
+Built-in Load Balancing: Works with Ribbon or Spring Cloud LoadBalancer to distribute calls across instances.
+```Snippet Java
+@FeignClient("accounts")
+public interface AccountFeignClients {
+
+    @GetMapping("/api/requests/accounts/{id}")
+    public ResponseEntity<AccountResponseDto> getAccountDetails(@PathVariable("id") Long accountId);
+}
+```
 ---
 
 ### 🚧 Future Enhancements
