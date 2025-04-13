@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: "eurekaserver"
+  config:
+    import: configserver:http://localhost:8071
+server:
+  port: 8070
