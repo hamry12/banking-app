@@ -64,21 +64,20 @@ public class TransactionServiceImpl implements TransactionService{
         Long toAccountId=transferRequestDto.getReceiverAccountDetails().getAccountId();
 
         ResponseEntity<AccountResponseDto> response = accountFeignClients.getAccountDetails(fromAccountId);
-        if (response == null || response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+        if (response == null || !response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new RuntimeException("Account details not found for ID: " + fromAccountId);
         }
-
 
         if(Objects.equals(fromAccountId, toAccountId)){
             throw new SameAccountException("Amount can not be transferred to the same account");
         }
 
-        /**
-         * Todo: Add the logic to check the balance before transfer
-         */
         BalanceResponseDto balanceResponseDto=getBalance(fromAccountId);
+        BigDecimal amountToBeTransferred=transferRequestDto.getAmountToBeTransferred();
+        BigDecimal additionalCharges=transferRequestDto.getAdditionalCharges();
+        BigDecimal totalAmount=amountToBeTransferred.add(additionalCharges);
         if(balanceResponseDto.getAvailableBalance()
-                .compareTo(transferRequestDto.getAmountToBeTransferred())<0) {
+                .compareTo(totalAmount)<0) {
             throw new InsufficientBalanceException("Insufficient balance");
         }
 
@@ -87,40 +86,45 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionStatus transactionStatus;
         String message;
         TransferResponseDto transferResponseDto= new TransferResponseDto();
+
+//        Generate the transaction id
         String transactionId=idGeneratorUtils.generateId();
+
+//        Map the transaction details
         Transactions transactions= transactionMapper.mapToTransactions(transferRequestDto);
 
-        /**
-         * Todo: Add the design pattern to handle the different transfer methods and update the transaction status
-         * uncomment this section only if you do not want design pattern based implementation
-         * if(transferMethod.equals(TransactionType.IMPS)){
-         *             transactionStatus= TransactionStatus.SUCCESS;
-         *             message="Amount transferred successfully";
-         *         }else{
-         *             transactionStatus=TransactionStatus.PENDING;
-         *             message="Amount transfer requested successfully";
-         *         }
-         */
+//        Fetch transaction status and message
         TransactionStrategy transactionStrategy=
                 transactionStrategyFactory.getStrategy(transferMethod);
         transactionStatus=transactionStrategy.getTransactionStatus();
         message=transactionStrategy.getMessage();
 
+//        save transaction information in the database
         transactions.setTransactionStatus(transactionStatus);
         transactions.setTransactionId(transactionId);
         transactions.setTotalAmount(transactions.getTransactionAmount()
                 .add(transactions.getTransactionFee()));
         Transactions savedTransaction = transactionRepository.save(transactions);
+
+
+//        update balance of the sender account
+        BigDecimal remainingBalance=balanceResponseDto
+                .getAvailableBalance()
+                .subtract(totalAmount);
+        accountBalanceRepository.updateBalanceByAccountId(fromAccountId,remainingBalance);
+
+//        check if the transaction is between same bank if not save the external account.
         if(!isSameBank){
             ExternalAccounts externalAccounts=
                     transactionMapper.mapToExternalAccounts(transferRequestDto);
             externalAccounts.setTransactions(savedTransaction);
             externalRepository.save(externalAccounts);
+        }else{
+            BigDecimal receiverBalance=accountBalanceRepository.findBalanceByAccountId(toAccountId);
+            receiverBalance=receiverBalance.add(amountToBeTransferred);
+            accountBalanceRepository.updateBalanceByAccountId(toAccountId,receiverBalance);
         }
 
-        /**
-         * Todo: Add the logic to update the balance
-         */
         transferResponseDto.setTransactionId(transactionId);
         transferResponseDto.setMessage(message);
         transferResponseDto.setTimestamp(LocalDateTime.now());

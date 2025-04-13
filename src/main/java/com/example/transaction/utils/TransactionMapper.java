@@ -35,6 +35,7 @@ public class TransactionMapper {
                 transferRequestDto.getReceiverAccountDetails().getAccountHolderName());
         externalAccounts.setIfscCode(transferRequestDto.getReceiverAccountDetails().getIfscCode());
         externalAccounts.setExternalAccountId(transferRequestDto.getReceiverAccountDetails().getAccountId());
+        externalAccounts.setCreatedAt(LocalDateTime.now());
         return externalAccounts;
     }
 }
