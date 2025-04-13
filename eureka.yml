@@ -6,4 +6,5 @@ spring:
       hostname: localhost
     fetch-registry: false
     register-with-eureka: false
-    defaultZone: http://localhost:8070/eureka
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka
