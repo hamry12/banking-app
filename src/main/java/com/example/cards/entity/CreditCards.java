@@ -1,9 +1,7 @@
 package com.example.cards.entity;
 
 import com.example.cards.constant.CardNetworkType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +19,7 @@ import java.time.LocalDateTime;
 public class CreditCards extends BaseEntity{
 
     @Id
+    @Column(name = "credit_card_id")
     private Long creditCardId;
     private String cardName;
     private CardNetworkType cardNetworkType;

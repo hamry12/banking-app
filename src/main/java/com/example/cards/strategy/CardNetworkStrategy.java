@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 
 public interface CardNetworkStrategy {
     public CardNetworkType getCardNetworkType();
-    public BigDecimal cardIssuanceCharges();
+    public Double cardIssuanceCharges();
 }

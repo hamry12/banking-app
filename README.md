@@ -15,6 +15,24 @@ The **Cards Microservice** is a Spring Boot-based service designed to manage cre
 
 ---
 
+## 💡 Design Patterns Used
+
+### 🧩 Strategy Pattern — *Card Network Handling*
+
+This pattern is used to abstract the behavior for various card networks such as:
+
+- **RUPAY**
+- **VISA**
+- **MASTERCARD**
+
+Each strategy implementation returns:
+- `issuanceCharge`
+- `cardType` (credit/debit)
+
+> This design promotes **open/closed principle**: new card networks can be added without modifying existing logic.
+
+---
+
 ## 🚀 Technology Stack & Features
 
 | Feature                     | Description                                                  |
