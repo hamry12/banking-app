@@ -55,8 +55,74 @@ The Spring Cloud Gateway uses **Spring Cloud Discovery Client** for internal ser
 
 The gateway will route requests to these services, but the internal communication between the gateway and the services will be done via the **Spring Cloud Discovery Client**.
 
-## Future Enhancements
+## Security Setup with Spring Cloud Gateway and Keycloak
+To implement security in our Spring Cloud Gateway server, we are using Spring Security along with Keycloak as the Identity and Access Management (IAM) tool.
 
-1. **Securing the Gateway using OpenID Connect**:
-    - The next phase of development will include securing the Spring Cloud Gateway using **OpenID Connect** (OIDC).
-    - This will ensure that all incoming requests are authenticated and authorized via OpenID Connect, allowing seamless integration with identity providers like Google, Auth0, or Keycloak.
+### 🧰 Prerequisites
+Docker installed on your machine
+
+Basic understanding of Spring Cloud Gateway
+
+Port 7080 should be available (for Keycloak UI)
+
+### 🚀 Setting Up Keycloak with Docker
+We will run Keycloak using Docker. You can find more information on their official site:
+👉 Keycloak Docker Quickstart
+
+Run the following command to start the Keycloak server in development mode:
+```bash
+docker run -p 7080:8080 \
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+  -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:26.2.0 start-dev
+```
+
+Once the container is up and running, open your browser and visit:
+http://localhost:7080
+
+Log in using the following credentials:
+
+- Username: admin
+- Password: admin
+
+### 🛠️ Realm and Client Configuration
+After logging in, you'll land on the Keycloak admin console.
+
+- 1. On the left navbar, select Realm.
+- 2. You can create a new realm, or use the default master realm.
+- 3. Next, go to Clients and click Create Client.
+
+Fill in the following details:
+
+Client Type: openid-connect
+Client ID: for example, bank-api-cc
+Name and Description as per your project needs
+Save the client.
+![Keycloak](images/1.png)
+![Keycloak](images/2.png)
+![Keycloak](images/3.png)
+![Keycloak](images/4.png)
+
+
+### use the below link to access the authentication token endpoint
+http://localhost:7080/realms/master/.well-known/openid-configuration
+
+![Keycloak](images/5.png)
+### Request Body
+```cURL
+curl --location 'http://localhost:7080/realms/master/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Cookie: JSESSIONID=26D83A9F71B3EBE8FB1176E220DF791D' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'client_id=bank-api-cc' \
+--data-urlencode 'client_secret=z68jEoq5mhWE4lWj5NGqz96vTJIWqw8i' \
+--data-urlencode 'scope=openid email profile'
+```
+
+### Response Body
+```json
+{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSOW1ZbzBFSjV2SWtWbkstMzJxR0dTeTE4eTVXZ2Q4X19yVHpBckhLcEtvIn0.eyJleHAiOjE3NDU0MTI5NjksImlhdCI6MTc0NTQxMjkwOSwianRpIjoidHJydGNjOjcwZjU5MDIwLTA4MzgtNGE1MC04NDc0LWFiMWE5NzE4M2U4NSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NzA4MC9yZWFsbXMvbWFzdGVyIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImU2M2MzODdjLTRmNDgtNGU1NC1iNTcwLWI4ZmI0Mzg4ZjFmNiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImJhbmstYXBpLWNjIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1tYXN0ZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImNsaWVudEhvc3QiOiIxNzIuMTcuMC4xIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtYmFuay1hcGktY2MiLCJjbGllbnRBZGRyZXNzIjoiMTcyLjE3LjAuMSIsImNsaWVudF9pZCI6ImJhbmstYXBpLWNjIn0.hBMlELhsJcTOxK5zQMgabdzAnuP6O1ZWzB4711ybYZpoIR5VedQmw1Dh2aOMuxmg5Y6L8RJs8WTLuwQB6WiLZS9hxC13TwqTmGah-23DyjbznFdE35limyZjsAN0JOJo2rNsArUcDVpTSekV08EKxMIynkdQX6iC2Evhx12_XnvHSo_ycIwzrJMSgjlMBqIgb1ZF2A3eqilzJc6XIlNeELI_HjhcpXf6lSYghO7j5KsvpfA-_phE_8_oOt16Dn2GPCyvw_qUmJ21PX_Luhi58ulVOFxxmIEWAlJT8ywKWGv_CAwGMCBwLZN-cSK6MlC6AT5-I8wlsqk_DTrjqdEWEw","expires_in":60,"refresh_expires_in":0,"token_type":"Bearer","id_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSOW1ZbzBFSjV2SWtWbkstMzJxR0dTeTE4eTVXZ2Q4X19yVHpBckhLcEtvIn0.eyJleHAiOjE3NDU0MTI5NjksImlhdCI6MTc0NTQxMjkwOSwianRpIjoiNmJhYjEzMDctNmM2ZS00ZmUzLWIxMzUtOTJlNjg5OTg5M2U0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo3MDgwL3JlYWxtcy9tYXN0ZXIiLCJhdWQiOiJiYW5rLWFwaS1jYyIsInN1YiI6ImU2M2MzODdjLTRmNDgtNGU1NC1iNTcwLWI4ZmI0Mzg4ZjFmNiIsInR5cCI6IklEIiwiYXpwIjoiYmFuay1hcGktY2MiLCJhdF9oYXNoIjoiTnNWMFhfSkFzWnJzZkpDLUJIUl9KdyIsImFjciI6IjEiLCJjbGllbnRIb3N0IjoiMTcyLjE3LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWJhbmstYXBpLWNjIiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4xNy4wLjEiLCJjbGllbnRfaWQiOiJiYW5rLWFwaS1jYyJ9.IrwSSA3Ac2PE7Y7VVFSxaYwyIFgfod--z_W6mY0AHzhEWWTFsupWbQCj-A4Z3C4KtEAsfIIUYbwjRKsYAdoVQZa_hY4_tvpcJ1B9pewFXhrjhaaIpfs4FcbdePhfA_zvhnlEtJzaoqdrtZwZeHcr-hKtTOC33gHqpDkrTYACV-YlLLNXb-6OzZxuPSzKO0xt6ZMZCok1TZFgKVFlYdns9Zlv-f_qSaPMLMVl5w7wDa_4h1humLe6j5aMezGMWOqZc7i5JS6HqIb88N6jxkKikd59X3uzMA-eUzE2uVdL4rDVVtHhxj5od8HGTIVzNeZfox83ZBqqNfvUK8_YTZDK7w","not-before-policy":0,"scope":"openid email profile"}
+```
+
+💡 Note: We are using port 7080 to access the Keycloak admin GUI instead of the default 8080 to avoid conflicts.
+
