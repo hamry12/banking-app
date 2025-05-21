@@ -2,8 +2,6 @@ package com.example.accounts.utils;
 
 import com.example.accounts.dto.AddressRequestDto;
 import com.example.accounts.dto.CustomerRegistrationDto;
-import com.example.accounts.entity.Address;
-import com.example.accounts.exception.NoPrimaryAddressFound;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

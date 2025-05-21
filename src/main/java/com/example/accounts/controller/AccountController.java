@@ -38,6 +38,12 @@ public class AccountController {
                 .body(accountDetails);
     }
 
+    /**
+     * Endpoint to update customer details for an existing account.
+     * @param accountId unique identifier of the account
+     * @param customerRegistrationDto containing the updated customer details
+     * @return ResponseEntity containing the success message
+     */
     @PutMapping("/accounts")
     public ResponseEntity<SuccessMessageDto> updateAccountDetails(@RequestParam("accountId") Long accountId,
                                                                   @RequestBody CustomerRegistrationDto customerRegistrationDto) {
