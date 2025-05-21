@@ -1,0 +1,6 @@
+kafka:
+  bootstrap-server: localhost:9092
+  default:
+    replication-factor: 1
+    partitions: 3
+    min-insync-replicas: 1
