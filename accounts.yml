@@ -7,10 +7,13 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8070/eureka
 spring:
-  config:
-    import: "configserver:kafka"
   application:
     name: accounts
+  config:
+    activate:
+      on-profile: default
+  profiles:
+    include: kafka
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:bank}
     username: ${MYSQL_USER:root}
