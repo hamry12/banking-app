@@ -9,9 +9,6 @@ eureka:
 spring:
   application:
     name: accounts
-  config:
-    activate:
-      on-profile: default
   profiles:
     include: kafka
   datasource:
