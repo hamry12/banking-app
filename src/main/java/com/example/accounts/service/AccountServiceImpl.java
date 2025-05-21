@@ -1,5 +1,6 @@
 package com.example.accounts.service;
 
+import com.example.accounts.config.KafkaTopics;
 import com.example.accounts.dto.*;
 import com.example.accounts.entity.*;
 import com.example.accounts.exception.*;
@@ -9,13 +10,18 @@ import com.example.accounts.repository.AddressRepository;
 import com.example.accounts.repository.CustomerRepository;
 import com.example.accounts.utils.IdGenerationUtils;
 import com.example.accounts.utils.MapperUtils;
+import com.example.constants.Channel;
+import com.example.events.NotificationEvent;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,7 +36,8 @@ public class AccountServiceImpl implements AccountService {
     private AddPayeeRepository addPayeeRepository;
     private MapperUtils mapperUtils;
     private IdGenerationUtils idGenerationUtils;
-
+    private KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+    private KafkaTopics kafkaTopics;
 
     /**
      * Retrieves account details for a given account ID.
@@ -113,6 +120,20 @@ public class AccountServiceImpl implements AccountService {
         accountCreatedDto.setAccountId(accountId);
         accountCreatedDto.setCreatedAt(LocalDateTime.now());
         accountCreatedDto.setMessage("Account created successfully");
+
+//        create kafka event for creation of account
+        String topic = kafkaTopics.getTopics().get("account-created");
+        NotificationEvent notificationEvent = new NotificationEvent(
+                topic,
+                List.of(Channel.EMAIL),
+                Map.of(
+                "accountId", accountId,
+                "email", email,
+                "mobile", mobile,
+                "createdAt", System.currentTimeMillis()
+                )
+        );
+        kafkaTemplate.send(topic,String.valueOf(accountId),notificationEvent);
         return accountCreatedDto;
     }
 
