@@ -12,6 +12,8 @@ spring:
   config:
     activate:
       on-profile: default
+  profiles:
+    include: kafka
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:bank}
     username: ${MYSQL_USER:root}
