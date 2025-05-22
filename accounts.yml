@@ -11,7 +11,7 @@ spring:
     name: accounts
   config:
     activate:
-      on-profile: default,kafka
+      on-profile: default
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:bank}
     username: ${MYSQL_USER:root}
@@ -28,3 +28,6 @@ spring:
       host: localhost
       port: 27017
       database: bank
+kafka:
+  topic:
+    account-created: account-created-event
