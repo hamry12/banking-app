@@ -1,10 +1,11 @@
 spring:
-  profiles: kafka
   kafka:
     bootstrap-servers: localhost:9092
     properties:
       spring.json.add.type.headers: false
+
 kafka:
+  bootstrap-servers: localhost:9092
   default:
     replication-factor: 1
     partitions: 3
