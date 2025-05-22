@@ -28,6 +28,3 @@ spring:
       host: localhost
       port: 27017
       database: bank
-kafka:
-  topics:
-    account-created: account-created-topic
