@@ -127,10 +127,10 @@ public class AccountServiceImpl implements AccountService {
                 topic,
                 List.of(Channel.EMAIL),
                 Map.of(
-                "accountId", accountId,
-                "email", email,
-                "mobile", mobile,
-                "createdAt", System.currentTimeMillis()
+                        "accountId", accountId,
+                        "email", email,
+                        "mobile", mobile,
+                        "createdAt", System.currentTimeMillis()
                 )
         );
         kafkaTemplate.send(topic,String.valueOf(accountId),notificationEvent);

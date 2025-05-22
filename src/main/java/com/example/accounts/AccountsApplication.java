@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * SpringBootApplication: Component Scans, Enable Auto configurations, Configuration
  */
-
 @SpringBootApplication
 public class AccountsApplication {
 
