@@ -29,5 +29,5 @@ spring:
       port: 27017
       database: bank
 kafka:
-  topic:
-    account-created: account-created-event
+  topics:
+    account-created: account-created-topic
