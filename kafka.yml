@@ -1,4 +1,5 @@
 spring:
+  profiles: kafka
   kafka:
     bootstrap-servers: localhost:9092
     properties:
@@ -6,7 +7,7 @@ spring:
 
 kafka:
   bootstrap-servers: localhost:9092
-  default:
+  default-config:
     replication-factor: 1
     partitions: 3
     min-insync-replicas: 1
