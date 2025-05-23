@@ -1,6 +1,11 @@
 spring:
   application:
-    name: "notification"
+    name: notification
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: notification-service-group
+      auto-offset-reset: earliest
 eureka:
   instance:
     preferIpAddress: true
@@ -9,7 +14,3 @@ eureka:
     register-with-eureka: true
     serviceUrl:
       defaultZone: http://localhost:8070/eureka
-kafka:
-  consumer:
-    bootstrap-servers: localhost:9092
-    group-id: notification-service-group
