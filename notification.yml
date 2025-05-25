@@ -4,6 +4,11 @@ spring:
   config:
     activate:
       on-profile: default
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: notification-service-group
+      auto-offset-reset: earliest
 eureka:
   instance:
     preferIpAddress: true
