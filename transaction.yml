@@ -9,6 +9,9 @@ eureka:
 spring:
   application:
     name: "transaction"
+  config:
+    activate:
+      on-profile: default
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:transactions}
     username: ${MYSQL_USER:root}
@@ -25,3 +28,6 @@ spring:
       host: localhost
       port: 27017
       database: bank
+kafka:
+  topics:
+    transaction-created: transaction-initiated-topic

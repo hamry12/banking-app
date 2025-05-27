@@ -17,3 +17,6 @@ eureka:
     register-with-eureka: true
     serviceUrl:
       defaultZone: http://localhost:8070/eureka
+kafka:
+  topics:
+    account-created: email-account-created-topic
