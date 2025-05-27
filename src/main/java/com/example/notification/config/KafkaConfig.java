@@ -1,8 +1,6 @@
 package com.example.notification.config;
 
 import com.example.events.NotificationEvent;
-import lombok.AllArgsConstructor;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
